@@ -12,6 +12,8 @@ const eslintConfig = defineConfig([
     "out/**",
     "build/**",
     "next-env.d.ts",
+    // Private working notes, gitignored; not part of the app.
+    "docs/**",
   ]),
 ]);
 
