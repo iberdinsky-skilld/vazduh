@@ -1,8 +1,12 @@
-import { withSentryConfig } from "@sentry/nextjs";
+import { withSentryConfig } from "@sentry/nextjs/config";
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  env: {
+    // Netlify sets CONTEXT at build time (production | deploy-preview | branch-deploy).
+    // Inlined into both server and client bundles so Sentry can tell environments apart.
+    NEXT_PUBLIC_SENTRY_ENV: process.env.CONTEXT ?? "development",
+  },
 };
 
 export default withSentryConfig(nextConfig, {
