@@ -17,6 +17,10 @@ export default async function Home() {
         <dd>
           <time dateTime={air.time}>{air.time}</time>
         </dd>
+        <dt>Fetched at</dt>
+        <dd>
+          <time dateTime={air.fetchedAt}>{air.fetchedAt}</time>
+        </dd>
       </dl>
     </main>
   );
