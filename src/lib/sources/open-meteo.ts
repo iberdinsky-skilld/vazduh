@@ -34,7 +34,7 @@ export async function getCurrentAir(): Promise<CurrentAir> {
   })
 
   const response = await fetch(`${OPEN_METEO_AIR_URL}?${params}`, {
-    next: { revalidate: 60, tags: ["air"] }
+    next: { revalidate: 3600, tags: ["air"] }
   })
   if (!response.ok) {
     throw new Error(`Open-Meteo responded with ${response.status}`)
