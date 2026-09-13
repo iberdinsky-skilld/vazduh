@@ -1,5 +1,6 @@
 import { getOpstine } from "@/lib/graphql/opstina";
 import { OpstinaPicker } from "@/components/opstina-picker";
+import Link from "next/link";
 
 export default async function Home() {
   const opstine = await getOpstine();
@@ -12,6 +13,20 @@ export default async function Home() {
           Air quality in Belgrade, municipality by municipality. Model estimate
           plus the citizen sensors nearest to you, updated hourly.
         </p>
+        <nav
+          aria-label="Municipalities"
+          className="flex flex-wrap gap-x-3 gap-y-1"
+        >
+          {opstine.map((o) => (
+            <Link
+              key={o.slug}
+              href={`/opstina/${o.slug}`}
+              className="text-sm underline underline-offset-2"
+            >
+              {o.name}
+            </Link>
+          ))}
+        </nav>
       </header>
       <OpstinaPicker opstine={opstine} />
     </main>
