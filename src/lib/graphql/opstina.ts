@@ -31,7 +31,7 @@ export type Opstina = {
   sensors: Measurement[];
 };
 
-export type OpstinaListItem = Pick<Opstina, "slug" | "name">;
+export type OpstinaListItem = Pick<Opstina, "slug" | "name" | "model">;
 
 export type OpstinaData = { opstina: Opstina | null };
 export type OpstinaVars = { slug: string };
@@ -65,6 +65,7 @@ const OPSTINE_QUERY = `
     opstine {
       slug
       name
+      model { eaqi }
     }
   }
 `;

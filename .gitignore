@@ -44,3 +44,6 @@ docs
 
 # Sentry Config File
 .env.sentry-build-plugin
+
+# copied from node_modules on postinstall (see scripts/copy-maplibre-worker.mjs)
+/public/map/maplibre/
