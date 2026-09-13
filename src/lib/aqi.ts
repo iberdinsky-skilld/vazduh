@@ -7,82 +7,32 @@
 export const EAQI_SOURCE_URL = "https://airindex.eea.europa.eu/AQI/index.html";
 
 export const EAQI_BANDS = [
-  {
-    from: 0,
-    label: "Good",
-    color: "#50f0e6",
-    text: "#111",
-    advice: "The air quality is good. Enjoy your usual outdoor activities.",
-    sensitive: "The air quality is good. Enjoy your usual outdoor activities.",
-  },
-  {
-    from: 20,
-    label: "Fair",
-    color: "#50ccaa",
-    text: "#111",
-    advice: "Enjoy your usual outdoor activities.",
-    sensitive: "Enjoy your usual outdoor activities.",
-  },
-  {
-    from: 40,
-    label: "Moderate",
-    color: "#f0e641",
-    text: "#111",
-    advice: "Enjoy your usual outdoor activities.",
-    sensitive:
-      "Consider reducing intense outdoor activities, if you experience symptoms.",
-  },
-  {
-    from: 60,
-    label: "Poor",
-    color: "#ff5050",
-    text: "#fff",
-    advice:
-      "Consider reducing intense activities outdoors, if you experience symptoms such as sore eyes, a cough or sore throat.",
-    sensitive:
-      "Consider reducing physical activities, particularly outdoors, especially if you experience symptoms.",
-  },
-  {
-    from: 80,
-    label: "Very poor",
-    color: "#960032",
-    text: "#fff",
-    advice:
-      "Consider reducing intense activities outdoors, if you experience symptoms such as sore eyes, a cough or sore throat.",
-    sensitive:
-      "Reduce physical activities, particularly outdoors, especially if you experience symptoms.",
-  },
-  {
-    from: 100,
-    label: "Extremely poor",
-    color: "#7d2181",
-    text: "#fff",
-    advice: "Reduce physical activities outdoors.",
-    sensitive: "Avoid physical activities outdoors.",
-  },
+  { key: "good", from: 0, color: "#50f0e6", text: "#111" },
+  { key: "fair", from: 20, color: "#50ccaa", text: "#111" },
+  { key: "moderate", from: 40, color: "#f0e641", text: "#111" },
+  { key: "poor", from: 60, color: "#ff5050", text: "#fff" },
+  { key: "veryPoor", from: 80, color: "#960032", text: "#fff" },
+  { key: "extremelyPoor", from: 100, color: "#7d2181", text: "#fff" },
 ] as const;
 
 export const EAQI_NO_DATA = {
-  label: "No data",
+  key: "noData",
+  from: Number.NEGATIVE_INFINITY,
   color: "#d0d0d0",
   text: "#111",
-  advice: "",
-  sensitive: "",
 } as const;
 
 /**
- * `text` is the readable foreground for a badge on `color`. `advice` and
- * `sensitive` are the EEA index messages for the general population and for
- * sensitive groups (children, elderly, people with respiratory or heart
- * conditions), quoted from EAQI_SOURCE_URL on 2026-09-13; only trailing
- * full stops were normalised. We do not write health advice ourselves.
+ * `key` addresses the band's label and EEA health messages in messages/<locale>.json
+ * under "Bands" (general population `advice`, `sensitive` groups). English is
+ * quoted from EAQI_SOURCE_URL on 2026-09-13; sr and ru are our translations.
+ * `text` is the readable foreground for a badge on `color`.
  */
 export type EaqiBand = {
-  label: string;
+  key: string;
+  from: number;
   color: string;
   text: string;
-  advice: string;
-  sensitive: string;
 };
 
 /** Upper bound of a band for display, e.g. "20–40". */

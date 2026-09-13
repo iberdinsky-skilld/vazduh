@@ -1,7 +1,15 @@
 import { withSentryConfig } from "@sentry/nextjs/config";
+import createNextIntlPlugin from "next-intl/plugin";
 import type { NextConfig } from "next";
 
+const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
+
 const nextConfig: NextConfig = {
+  experimental: {
+    // Global 404 outside /[locale] without rendering a layout; localised 404s
+    // are [locale]/not-found.tsx. See src/app/global-not-found.tsx.
+    globalNotFound: true,
+  },
   env: {
     // Netlify sets CONTEXT at build time (production | deploy-preview | branch-deploy).
     // Inlined into both server and client bundles so Sentry can tell environments apart.
@@ -9,7 +17,7 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withSentryConfig(nextConfig, {
+export default withSentryConfig(withNextIntl(nextConfig), {
   // For all available options, see:
   // https://www.npmjs.com/package/@sentry/webpack-plugin#options
 

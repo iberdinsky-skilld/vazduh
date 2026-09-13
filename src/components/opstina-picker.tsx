@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense, useState } from "react";
+import { useTranslations } from "next-intl";
 import { useSuspenseQuery } from "@apollo/client/react";
 import { OPSTINA_DOC, type OpstinaListItem } from "@/lib/graphql/opstina";
 import {
@@ -25,17 +26,18 @@ const AirMap = dynamic(() => import("./air-map"), {
 });
 
 export function OpstinaPicker({ opstine }: { opstine: OpstinaListItem[] }) {
+  const t = useTranslations("Picker");
   const [slug, setSlug] = useState("vracar");
   return (
     <div className="grid gap-6 md:grid-cols-2">
       <div className="flex flex-col gap-4">
         <Select value={slug} onValueChange={setSlug}>
-          <SelectTrigger className="w-full" aria-label="Municipality">
-            <SelectValue placeholder="Select a municipality" />
+          <SelectTrigger className="w-full" aria-label={t("label")}>
+            <SelectValue placeholder={t("placeholder")} />
           </SelectTrigger>
           <SelectContent>
             <SelectGroup>
-              <SelectLabel>Opština</SelectLabel>
+              <SelectLabel>{t("group")}</SelectLabel>
               {opstine.map((o) => (
                 <SelectItem key={o.slug} value={o.slug}>
                   {o.name}
@@ -44,7 +46,9 @@ export function OpstinaPicker({ opstine }: { opstine: OpstinaListItem[] }) {
             </SelectGroup>
           </SelectContent>
         </Select>
-        <Suspense fallback={<p className="text-muted-foreground">Loading…</p>}>
+        <Suspense
+          fallback={<p className="text-muted-foreground">{t("loading")}</p>}
+        >
           <OpstinaReadings slug={slug} />
         </Suspense>
       </div>
@@ -62,9 +66,10 @@ export function OpstinaPicker({ opstine }: { opstine: OpstinaListItem[] }) {
 }
 
 function OpstinaReadings({ slug }: { slug: string }) {
+  const t = useTranslations("Picker");
   const { data } = useSuspenseQuery(OPSTINA_DOC, { variables: { slug } });
   const opstina = data.opstina;
-  if (!opstina) return <p>Unknown municipality.</p>;
+  if (!opstina) return <p>{t("unknown")}</p>;
   return (
     <div className="flex flex-col gap-4">
       <ModelCard reading={opstina.model} />

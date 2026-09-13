@@ -1,0 +1,91 @@
+{
+  "Meta": {
+    "title": "Vazduh — air quality in Belgrade by municipality",
+    "description": "What you breathe in your part of Belgrade right now: model data and citizen sensors for all 17 municipalities.",
+    "opstinaTitle": "{name}: air quality now",
+    "opstinaDescription": "{name} right now: {band} (EAQI {eaqi}), PM2.5 {pm25} µg/m³. Model estimate plus {sensors} citizen sensors, updated hourly.",
+    "opstinaDescriptionNoData": "Air quality in {name}, Belgrade: model estimate and citizen sensors, updated hourly."
+  },
+  "Home": {
+    "title": "Vazduh",
+    "tagline": "Air quality in Belgrade, municipality by municipality. Model estimate plus the citizen sensors nearest to you, updated hourly.",
+    "nav": "Municipalities"
+  },
+  "Picker": {
+    "label": "Municipality",
+    "placeholder": "Select a municipality",
+    "group": "Municipality",
+    "loading": "Loading…",
+    "unknown": "Unknown municipality."
+  },
+  "Opstina": {
+    "back": "← All municipalities"
+  },
+  "NotFound": {
+    "title": "Page not found",
+    "text": "No such page. Belgrade has 17 municipalities and each has its own page; the full list is on the home page.",
+    "back": "← Back to all municipalities"
+  },
+  "Model": {
+    "title": "Model estimate",
+    "description": "Copernicus CAMS forecast via Open-Meteo, read at the centre of the municipality. Same for everyone within a few kilometres.",
+    "eaqi": "European AQI",
+    "modelHour": "Model hour",
+    "pulled": "Pulled",
+    "noData": "No model data yet."
+  },
+  "Sensors": {
+    "title": "Citizen sensors ({count})",
+    "description": "sensor.community devices on balconies inside the municipality, latest hour. Real measurements, but each one sees only its own street.",
+    "none": "No citizen sensor here yet. Put one up: sensor.community kits cost about €40.",
+    "rh": "Relative humidity",
+    "humid": "humid",
+    "humidHint": "Optical sensors over-read PM when humid"
+  },
+  "Bands": {
+    "good": {
+      "label": "Good",
+      "advice": "The air quality is good. Enjoy your usual outdoor activities.",
+      "sensitive": "The air quality is good. Enjoy your usual outdoor activities."
+    },
+    "fair": {
+      "label": "Fair",
+      "advice": "Enjoy your usual outdoor activities.",
+      "sensitive": "Enjoy your usual outdoor activities."
+    },
+    "moderate": {
+      "label": "Moderate",
+      "advice": "Enjoy your usual outdoor activities.",
+      "sensitive": "Consider reducing intense outdoor activities, if you experience symptoms."
+    },
+    "poor": {
+      "label": "Poor",
+      "advice": "Consider reducing intense activities outdoors, if you experience symptoms such as sore eyes, a cough or sore throat.",
+      "sensitive": "Consider reducing physical activities, particularly outdoors, especially if you experience symptoms."
+    },
+    "veryPoor": {
+      "label": "Very poor",
+      "advice": "Consider reducing intense activities outdoors, if you experience symptoms such as sore eyes, a cough or sore throat.",
+      "sensitive": "Reduce physical activities, particularly outdoors, especially if you experience symptoms."
+    },
+    "extremelyPoor": {
+      "label": "Extremely poor",
+      "advice": "Reduce physical activities outdoors.",
+      "sensitive": "Avoid physical activities outdoors."
+    },
+    "noData": { "label": "No data", "advice": "", "sensitive": "" }
+  },
+  "Legend": {
+    "title": "How to read this",
+    "intro": "Colours follow the <link>European Air Quality Index</link> (EAQI) of the European Environment Agency. Advice is theirs, not ours.",
+    "sensitiveGroups": "Sensitive groups:",
+    "noDataHint": "No reading for this hour yet.",
+    "pm25": "Particles under 2.5 µm: smoke, traffic, heating. Small enough to reach the bloodstream. The number that matters most.",
+    "pm10": "Particles under 10 µm: dust, pollen, road wear. Irritate airways.",
+    "eaqi": "0 to 100+. Driven by the worst pollutant of the hour, so it can be higher than PM alone suggests.",
+    "rh": "Relative humidity. Cheap optical sensors count water droplets as dust: above 70 % their PM readings run high.",
+    "modelVsSensorsTerm": "Model vs sensors",
+    "modelVsSensors": "The model is a Europe-wide forecast on a ~10 km grid, smooth and blind to your street. Sensors are real but hyper-local and noisy. They disagree often. Both are shown on purpose.",
+    "disclaimer": "Not medical advice. Data: Open-Meteo (CAMS) and sensor.community, refreshed hourly."
+  }
+}
