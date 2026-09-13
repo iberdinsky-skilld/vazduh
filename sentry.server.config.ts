@@ -8,6 +8,11 @@ Sentry.init({
   dsn: "https://aa21417b6e8c8b6bfda8a08c4eba0def@o4512033050525696.ingest.de.sentry.io/4512033060946000",
 
   environment: process.env.NEXT_PUBLIC_SENTRY_ENV,
+  // Local dev and e2e builds (CI stages a backend outage on purpose) would
+  // only add noise; previews and production report as usual.
+  enabled: !["development", "e2e"].includes(
+    process.env.NEXT_PUBLIC_SENTRY_ENV ?? "",
+  ),
 
   // Define how likely traces are sampled. Adjust this value in production, or use tracesSampler for greater control.
   tracesSampleRate: 1,

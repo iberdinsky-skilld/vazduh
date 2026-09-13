@@ -73,7 +73,11 @@
       "advice": "Smanji fizičke aktivnosti napolju.",
       "sensitive": "Izbegavaj fizičke aktivnosti napolju."
     },
-    "noData": { "label": "Nema podataka", "advice": "", "sensitive": "" }
+    "noData": {
+      "label": "Nema podataka",
+      "advice": "",
+      "sensitive": ""
+    }
   },
   "Legend": {
     "title": "Kako ovo čitati",
@@ -87,5 +91,13 @@
     "modelVsSensorsTerm": "Model i senzori",
     "modelVsSensors": "Model je prognoza za celu Evropu na mreži od ~10 km, glatka i slepa za tvoju ulicu. Senzori su stvarni, ali hiperlokalni i šumni. Često se ne slažu. Oba se prikazuju namerno.",
     "disclaimer": "Nije medicinski savet. Preporuke EEA prevedene su sa engleskog. Podaci: Open-Meteo (CAMS) i sensor.community, osvežavaju se svakog sata."
+  },
+  "Error": {
+    "title": "Nešto nije u redu",
+    "backend": "Servis podataka trenutno nije dostupan. Keširane stranice rade; podaci uživo se vraćaju čim on proradi.",
+    "retry": "Pokušaj ponovo"
+  },
+  "Map": {
+    "unsupported": "Mapi je potreban WebGL2, koji ovaj pregledač nema. Očitavanja iznad i dalje rade."
   }
 }
