@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 import { LANG_TAG, routing } from "@/i18n/routing";
 import { Link } from "@/i18n/navigation";
 import { LocaleSwitcher } from "@/components/locale-switcher";
+import { SITE_URL, languageAlternates, localizedUrl } from "@/lib/site";
 
 // Inter: Latin, Latin Extended (č ć đ š ž) and Cyrillic in one family.
 // Geist has no Cyrillic. Mono is only used for sensor ids, so Geist Mono stays.
@@ -34,7 +35,15 @@ export async function generateMetadata({
   // otherwise /unknown.txt tries to import messages/unknown.txt.json.
   if (!hasLocale(routing.locales, locale)) notFound();
   const t = await getTranslations({ locale, namespace: "Meta" });
-  return { title: t("title"), description: t("description") };
+  return {
+    metadataBase: new URL(SITE_URL),
+    title: t("title"),
+    description: t("description"),
+    alternates: {
+      canonical: localizedUrl(locale, "/"),
+      languages: languageAlternates("/"),
+    },
+  };
 }
 
 export default async function LocaleLayout({

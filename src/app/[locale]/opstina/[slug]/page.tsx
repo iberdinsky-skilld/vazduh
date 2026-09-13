@@ -5,6 +5,9 @@ import { ModelCard, SensorsCard } from "@/components/readings";
 import { getOpstina, getOpstine } from "@/lib/graphql/opstina";
 import { eaqiBand } from "@/lib/aqi";
 import { Link } from "@/i18n/navigation";
+import { hasLocale } from "next-intl";
+import { routing } from "@/i18n/routing";
+import { languageAlternates, localizedUrl } from "@/lib/site";
 
 /** Only the slug: the locale segment gets its params from [locale]/layout. */
 export async function generateStaticParams() {
@@ -39,7 +42,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       })
     : t("opstinaDescriptionNoData", { name: opstina.name });
 
-  return { title: t("opstinaTitle", { name: opstina.name }), description };
+  const path = `/opstina/${slug}`;
+  return {
+    title: t("opstinaTitle", { name: opstina.name }),
+    description,
+    alternates: {
+      canonical: hasLocale(routing.locales, locale)
+        ? localizedUrl(locale, path)
+        : undefined,
+      languages: languageAlternates(path),
+    },
+  };
 }
 
 export default async function OpstinaPage({ params }: Props) {
