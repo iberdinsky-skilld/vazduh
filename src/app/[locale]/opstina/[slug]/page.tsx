@@ -26,7 +26,7 @@ type Props = PageProps<"/[locale]/opstina/[slug]">;
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale, slug } = await params;
   // Same fetch as the page below: request memoization dedupes it within one render.
-  const opstina = await getOpstina(slug);
+  const opstina = await getOpstina(slug, locale);
   if (!opstina) notFound();
 
   const t = await getTranslations({ locale, namespace: "Meta" });
@@ -58,7 +58,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function OpstinaPage({ params }: Props) {
   const { locale, slug } = await params;
   setRequestLocale(locale);
-  const opstina = await getOpstina(slug);
+  const opstina = await getOpstina(slug, locale);
   if (!opstina) notFound();
   const t = await getTranslations("Opstina");
 

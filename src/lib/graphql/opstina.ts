@@ -34,7 +34,8 @@ export type Opstina = {
 export type OpstinaListItem = Pick<Opstina, "slug" | "name" | "model">;
 
 export type OpstinaData = { opstina: Opstina | null };
-export type OpstinaVars = { slug: string };
+/** `lang` picks the municipality name translation (sr, en, ru); slug is language-neutral. */
+export type OpstinaVars = { slug: string; lang?: string };
 
 const MEASUREMENT_FIELDS = `
   source
@@ -48,8 +49,8 @@ const MEASUREMENT_FIELDS = `
 `;
 
 const OPSTINA_QUERY = `
-  query Opstina($slug: String!) {
-    opstina(slug: $slug) {
+  query Opstina($slug: String!, $lang: String) {
+    opstina(slug: $slug, lang: $lang) {
       slug
       name
       lat
@@ -61,8 +62,8 @@ const OPSTINA_QUERY = `
 `;
 
 const OPSTINE_QUERY = `
-  query Opstine {
-    opstine {
+  query Opstine($lang: String) {
+    opstine(lang: $lang) {
       slug
       name
       model { eaqi }
@@ -71,14 +72,18 @@ const OPSTINE_QUERY = `
 `;
 
 /** Returns null for an unknown slug — the page decides between 404 and fallback. */
-export async function getOpstina(slug: string): Promise<Opstina | null> {
-  const data = await fetchGraphQL<OpstinaData>(OPSTINA_QUERY, { slug });
+export async function getOpstina(
+  slug: string,
+  lang?: string,
+): Promise<Opstina | null> {
+  const data = await fetchGraphQL<OpstinaData>(OPSTINA_QUERY, { slug, lang });
   return data.opstina;
 }
 
-export async function getOpstine(): Promise<OpstinaListItem[]> {
+export async function getOpstine(lang?: string): Promise<OpstinaListItem[]> {
   const data = await fetchGraphQL<{ opstine: OpstinaListItem[] }>(
     OPSTINE_QUERY,
+    { lang },
   );
   return data.opstine;
 }
