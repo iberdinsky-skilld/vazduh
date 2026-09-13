@@ -39,7 +39,11 @@ test.describe("home page", () => {
     await trigger.focus();
     await page.keyboard.press("Enter");
     await expect(page.getByRole("listbox")).toBeVisible();
+    // Radix moves focus to the selected option a tick after opening; pressing
+    // ArrowDown before that lands nowhere and Enter re-selects the same item.
+    await expect(page.getByRole("option", { name: "Vračar" })).toBeFocused();
     await page.keyboard.press("ArrowDown");
+    await expect(page.getByRole("option", { name: "Zemun" })).toBeFocused();
     await page.keyboard.press("Enter");
     await expect(page.getByRole("listbox")).toBeHidden();
     await expect(trigger).toBeFocused(); // focus returns to the trigger
