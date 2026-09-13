@@ -1,3 +1,4 @@
+import { useLocale, useTranslations } from "next-intl";
 import { Badge } from "@/components/ui/badge";
 import {
   Card,
@@ -8,53 +9,53 @@ import {
 } from "@/components/ui/card";
 import type { Measurement } from "@/lib/graphql/opstina";
 import { eaqiBand } from "@/lib/aqi";
+import { LANG_TAG, type Locale } from "@/i18n/routing";
 
 /** Above this relative humidity cheap optical sensors over-read PM. */
 const HUMIDITY_WARN = 70;
-
-const belgradeTime = new Intl.DateTimeFormat("en-GB", {
-  timeZone: "Europe/Belgrade",
-  day: "numeric",
-  month: "short",
-  hour: "2-digit",
-  minute: "2-digit",
-});
 
 function fmt(value: number | null): string {
   return value === null ? "—" : value.toFixed(1);
 }
 
-/** Fixed locale and zone: the same string on the server and in the browser. */
-function fmtTime(iso: string): string {
-  return belgradeTime.format(new Date(iso));
+/** Fixed zone; locale from the route, so server and browser agree. */
+function useTimeFormat() {
+  const locale = useLocale() as Locale;
+  return new Intl.DateTimeFormat(LANG_TAG[locale], {
+    timeZone: "Europe/Belgrade",
+    day: "numeric",
+    month: "short",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
 }
 
 export function EaqiBadge({ value }: { value: number | null }) {
+  const t = useTranslations("Bands");
   const band = eaqiBand(value);
   return (
     <Badge
       style={{ backgroundColor: band.color, color: band.text }}
       className="border-transparent"
     >
-      {value ?? "–"} · {band.label}
+      {value ?? "–"} · {t(`${band.key}.label`)}
     </Badge>
   );
 }
 
 export function ModelCard({ reading }: { reading: Measurement | null }) {
+  const t = useTranslations("Model");
+  const time = useTimeFormat();
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Model estimate</CardTitle>
-        <CardDescription>
-          Copernicus CAMS forecast via Open-Meteo, read at the centre of the
-          municipality. Same for everyone within a few kilometres.
-        </CardDescription>
+        <CardTitle>{t("title")}</CardTitle>
+        <CardDescription>{t("description")}</CardDescription>
       </CardHeader>
       <CardContent>
         {reading ? (
           <dl className="grid grid-cols-[auto_1fr] items-center gap-x-6 gap-y-2">
-            <dt className="text-muted-foreground">European AQI</dt>
+            <dt className="text-muted-foreground">{t("eaqi")}</dt>
             <dd className="flex flex-col gap-1">
               <div>
                 <EaqiBadge value={reading.eaqi} />
@@ -64,21 +65,21 @@ export function ModelCard({ reading }: { reading: Measurement | null }) {
             <dd>{fmt(reading.pm25)} µg/m³</dd>
             <dt className="text-muted-foreground">PM10</dt>
             <dd>{fmt(reading.pm10)} µg/m³</dd>
-            <dt className="text-muted-foreground">Model hour</dt>
+            <dt className="text-muted-foreground">{t("modelHour")}</dt>
             <dd>
               <time dateTime={reading.measuredAt}>
-                {fmtTime(reading.measuredAt)}
+                {time.format(new Date(reading.measuredAt))}
               </time>
             </dd>
-            <dt className="text-muted-foreground">Pulled</dt>
+            <dt className="text-muted-foreground">{t("pulled")}</dt>
             <dd>
               <time dateTime={reading.fetchedAt}>
-                {fmtTime(reading.fetchedAt)}
+                {time.format(new Date(reading.fetchedAt))}
               </time>
             </dd>
           </dl>
         ) : (
-          <p className="text-muted-foreground">No model data yet.</p>
+          <p className="text-muted-foreground">{t("noData")}</p>
         )}
       </CardContent>
     </Card>
@@ -86,21 +87,16 @@ export function ModelCard({ reading }: { reading: Measurement | null }) {
 }
 
 export function SensorsCard({ readings }: { readings: Measurement[] }) {
+  const t = useTranslations("Sensors");
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Citizen sensors ({readings.length})</CardTitle>
-        <CardDescription>
-          sensor.community devices on balconies inside the municipality, latest
-          hour. Real measurements, but each one sees only its own street.
-        </CardDescription>
+        <CardTitle>{t("title", { count: readings.length })}</CardTitle>
+        <CardDescription>{t("description")}</CardDescription>
       </CardHeader>
       <CardContent>
         {readings.length === 0 ? (
-          <p className="text-muted-foreground">
-            No citizen sensor here yet. Put one up: sensor.community kits cost
-            about €40.
-          </p>
+          <p className="text-muted-foreground">{t("none")}</p>
         ) : (
           <ul className="divide-y">
             {readings.map((r) => (
@@ -114,6 +110,7 @@ export function SensorsCard({ readings }: { readings: Measurement[] }) {
 }
 
 function SensorRow({ reading }: { reading: Measurement }) {
+  const t = useTranslations("Sensors");
   const humid = reading.humidity !== null && reading.humidity > HUMIDITY_WARN;
   return (
     <li className="flex flex-wrap items-baseline gap-x-4 gap-y-1 py-2">
@@ -122,15 +119,12 @@ function SensorRow({ reading }: { reading: Measurement }) {
       </span>
       <span>PM2.5 {fmt(reading.pm25)}</span>
       <span>PM10 {fmt(reading.pm10)} µg/m³</span>
-      <span className="text-muted-foreground" title="Relative humidity">
+      <span className="text-muted-foreground" title={t("rh")}>
         RH {fmt(reading.humidity)}%
       </span>
       {humid && (
-        <Badge
-          variant="outline"
-          title="Optical sensors over-read PM when humid"
-        >
-          humid
+        <Badge variant="outline" title={t("humidHint")}>
+          {t("humid")}
         </Badge>
       )}
     </li>

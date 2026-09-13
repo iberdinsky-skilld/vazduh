@@ -1,0 +1,91 @@
+{
+  "Meta": {
+    "title": "Vazduh — kvalitet vazduha u Beogradu po opštinama",
+    "description": "Šta udišeš u svom delu Beograda upravo sada: model i građanski senzori za svih 17 opština.",
+    "opstinaTitle": "{name}: kvalitet vazduha sada",
+    "opstinaDescription": "{name} upravo sada: {band} (EAQI {eaqi}), PM2.5 {pm25} µg/m³. Procena modela i {sensors} građanskih senzora, osvežava se svakog sata.",
+    "opstinaDescriptionNoData": "Kvalitet vazduha u opštini {name}, Beograd: procena modela i građanski senzori, osvežava se svakog sata."
+  },
+  "Home": {
+    "title": "Vazduh",
+    "tagline": "Kvalitet vazduha u Beogradu, opština po opština. Procena modela plus građanski senzori najbliži tebi, osvežava se svakog sata.",
+    "nav": "Opštine"
+  },
+  "Picker": {
+    "label": "Opština",
+    "placeholder": "Izaberi opštinu",
+    "group": "Opština",
+    "loading": "Učitavanje…",
+    "unknown": "Nepoznata opština."
+  },
+  "Opstina": {
+    "back": "← Sve opštine"
+  },
+  "NotFound": {
+    "title": "Stranica nije pronađena",
+    "text": "Nema takve stranice. Beograd ima 17 opština i svaka ima svoju stranicu; ceo spisak je na početnoj.",
+    "back": "← Nazad na sve opštine"
+  },
+  "Model": {
+    "title": "Procena modela",
+    "description": "Prognoza Copernicus CAMS preko Open-Meteo, očitana u centru opštine. Ista za sve u krugu od nekoliko kilometara.",
+    "eaqi": "Evropski AQI",
+    "modelHour": "Sat modela",
+    "pulled": "Preuzeto",
+    "noData": "Još nema podataka modela."
+  },
+  "Sensors": {
+    "title": "Građanski senzori ({count})",
+    "description": "Uređaji sensor.community na terasama unutar opštine, poslednji sat. Prava merenja, ali svaki vidi samo svoju ulicu.",
+    "none": "Ovde još nema građanskog senzora. Postavi svoj: sensor.community komplet košta oko 40 €.",
+    "rh": "Relativna vlažnost",
+    "humid": "vlažno",
+    "humidHint": "Optički senzori precenjuju PM pri visokoj vlažnosti"
+  },
+  "Bands": {
+    "good": {
+      "label": "Dobar",
+      "advice": "Kvalitet vazduha je dobar. Uživaj u uobičajenim aktivnostima napolju.",
+      "sensitive": "Kvalitet vazduha je dobar. Uživaj u uobičajenim aktivnostima napolju."
+    },
+    "fair": {
+      "label": "Prihvatljiv",
+      "advice": "Uživaj u uobičajenim aktivnostima napolju.",
+      "sensitive": "Uživaj u uobičajenim aktivnostima napolju."
+    },
+    "moderate": {
+      "label": "Umeren",
+      "advice": "Uživaj u uobičajenim aktivnostima napolju.",
+      "sensitive": "Razmisli o smanjenju intenzivnih aktivnosti napolju ako osetiš simptome."
+    },
+    "poor": {
+      "label": "Loš",
+      "advice": "Razmisli o smanjenju intenzivnih aktivnosti napolju ako osetiš simptome kao što su peckanje očiju, kašalj ili bol u grlu.",
+      "sensitive": "Razmisli o smanjenju fizičkih aktivnosti, naročito napolju, posebno ako osetiš simptome."
+    },
+    "veryPoor": {
+      "label": "Veoma loš",
+      "advice": "Razmisli o smanjenju intenzivnih aktivnosti napolju ako osetiš simptome kao što su peckanje očiju, kašalj ili bol u grlu.",
+      "sensitive": "Smanji fizičke aktivnosti, naročito napolju, posebno ako osetiš simptome."
+    },
+    "extremelyPoor": {
+      "label": "Izuzetno loš",
+      "advice": "Smanji fizičke aktivnosti napolju.",
+      "sensitive": "Izbegavaj fizičke aktivnosti napolju."
+    },
+    "noData": { "label": "Nema podataka", "advice": "", "sensitive": "" }
+  },
+  "Legend": {
+    "title": "Kako ovo čitati",
+    "intro": "Boje prate <link>Evropski indeks kvaliteta vazduha</link> (EAQI) Evropske agencije za životnu sredinu. Preporuke su njihove, ne naše.",
+    "sensitiveGroups": "Osetljive grupe:",
+    "noDataHint": "Još nema očitavanja za ovaj sat.",
+    "pm25": "Čestice ispod 2,5 µm: dim, saobraćaj, grejanje. Dovoljno sitne da dospeju u krvotok. Broj koji je najvažniji.",
+    "pm10": "Čestice ispod 10 µm: prašina, polen, habanje puteva. Nadražuju disajne puteve.",
+    "eaqi": "Od 0 do 100+. Određuje ga najgori zagađivač u tom satu, pa može biti viši nego što samo PM sugeriše.",
+    "rh": "Relativna vlažnost. Jeftini optički senzori broje kapljice vode kao prašinu: iznad 70 % njihova PM očitavanja su previsoka.",
+    "modelVsSensorsTerm": "Model i senzori",
+    "modelVsSensors": "Model je prognoza za celu Evropu na mreži od ~10 km, glatka i slepa za tvoju ulicu. Senzori su stvarni, ali hiperlokalni i šumni. Često se ne slažu. Oba se prikazuju namerno.",
+    "disclaimer": "Nije medicinski savet. Preporuke EEA prevedene su sa engleskog. Podaci: Open-Meteo (CAMS) i sensor.community, osvežavaju se svakog sata."
+  }
+}
