@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter, Geist_Mono } from "next/font/google";
 import { notFound } from "next/navigation";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
@@ -7,8 +7,15 @@ import "../globals.css";
 import { ApolloWrapper } from "@/lib/graphql/apollo";
 import { cn } from "@/lib/utils";
 import { LANG_TAG, routing } from "@/i18n/routing";
+import { Link } from "@/i18n/navigation";
+import { LocaleSwitcher } from "@/components/locale-switcher";
 
-const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
+// Inter: Latin, Latin Extended (č ć đ š ž) and Cyrillic in one family.
+// Geist has no Cyrillic. Mono is only used for sensor ids, so Geist Mono stays.
+const inter = Inter({
+  variable: "--font-inter",
+  subsets: ["latin", "latin-ext", "cyrillic"],
+});
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
@@ -43,14 +50,16 @@ export default async function LocaleLayout({
   return (
     <html
       lang={LANG_TAG[locale]}
-      className={cn(
-        "h-full antialiased",
-        geistSans.variable,
-        geistMono.variable,
-      )}
+      className={cn("h-full antialiased", inter.variable, geistMono.variable)}
     >
       <body className="flex min-h-full flex-col bg-background text-foreground">
         <NextIntlClientProvider>
+          <header className="mx-auto flex w-full max-w-7xl items-center justify-between px-4 py-3">
+            <Link href="/" className="font-semibold tracking-tight">
+              Vazduh
+            </Link>
+            <LocaleSwitcher />
+          </header>
           <ApolloWrapper>{children}</ApolloWrapper>
         </NextIntlClientProvider>
       </body>
