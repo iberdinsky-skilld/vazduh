@@ -27,7 +27,7 @@ export class GraphQLError extends Error {
   }
 }
 
-export async function gql<T>(
+export async function fetchGraphQL<T>(
   query: string,
   variables: Record<string, unknown> = {},
 ): Promise<T> {
