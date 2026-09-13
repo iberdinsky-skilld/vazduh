@@ -7,7 +7,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
   const { locale } = await params;
   setRequestLocale(locale);
   const t = await getTranslations("Home");
-  const opstine = await getOpstine();
+  const opstine = await getOpstine(locale);
 
   return (
     <main className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 pt-4 pb-8">

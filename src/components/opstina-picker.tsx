@@ -2,7 +2,7 @@
 
 import { Suspense, useState } from "react";
 import * as Sentry from "@sentry/nextjs";
-import { useTranslations } from "next-intl";
+import { useLocale, useTranslations } from "next-intl";
 import { useSuspenseQuery } from "@apollo/client/react";
 import { OPSTINA_DOC, type OpstinaListItem } from "@/lib/graphql/opstina";
 import {
@@ -84,8 +84,9 @@ export function OpstinaPicker({ opstine }: { opstine: OpstinaListItem[] }) {
 
 function OpstinaReadings({ slug, attempt }: { slug: string; attempt: number }) {
   const t = useTranslations("Picker");
+  const lang = useLocale();
   const { data } = useSuspenseQuery(OPSTINA_DOC, {
-    variables: { slug },
+    variables: { slug, lang },
     queryKey: attempt,
   });
   const opstina = data.opstina;
