@@ -14,6 +14,8 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
     // Private working notes, gitignored; not part of the app.
     "docs/**",
+    // Vendored MapLibre worker, copied on postinstall.
+    "public/map/maplibre/**",
   ]),
 ]);
 

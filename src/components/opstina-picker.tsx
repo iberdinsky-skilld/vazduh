@@ -4,6 +4,12 @@ import { Suspense, useState } from "react";
 import { useSuspenseQuery } from "@apollo/client/react";
 import { OPSTINA_DOC, type OpstinaListItem } from "@/lib/graphql/opstina";
 import { ModelReading, SensorReading } from "./readings";
+import dynamic from "next/dynamic";
+
+const AirMap = dynamic(() => import("./air-map"), {
+  ssr: false,
+  loading: () => <div className="h-96 w-full rounded bg-gray-100" />,
+});
 
 export function OpstinaPicker({ opstine }: { opstine: OpstinaListItem[] }) {
   const [slug, setSlug] = useState("vracar");
@@ -22,6 +28,7 @@ export function OpstinaPicker({ opstine }: { opstine: OpstinaListItem[] }) {
       </select>
       <Suspense fallback={<p>Loading…</p>}>
         <OpstinaReadings slug={slug} />
+        <AirMap opstine={opstine} selected={slug} onSelect={setSlug} />
       </Suspense>
     </>
   );
