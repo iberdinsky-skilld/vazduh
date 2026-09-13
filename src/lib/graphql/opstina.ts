@@ -1,4 +1,5 @@
-import { gql } from "./client";
+import { fetchGraphQL } from "./client";
+import { gql, type TypedDocumentNode } from "@apollo/client";
 
 /**
  * Hand-written types for exactly the fields the query below asks for.
@@ -30,6 +31,11 @@ export type Opstina = {
   sensors: Measurement[];
 };
 
+export type OpstinaListItem = Pick<Opstina, "slug" | "name">;
+
+export type OpstinaData = { opstina: Opstina | null };
+export type OpstinaVars = { slug: string };
+
 const MEASUREMENT_FIELDS = `
   source
   sensorId
@@ -54,8 +60,27 @@ const OPSTINA_QUERY = `
   }
 `;
 
+const OPSTINE_QUERY = `
+  query Opstine {
+    opstine {
+      slug
+      name
+    }
+  }
+`;
+
 /** Returns null for an unknown slug — the page decides between 404 and fallback. */
 export async function getOpstina(slug: string): Promise<Opstina | null> {
-  const data = await gql<{ opstina: Opstina | null }>(OPSTINA_QUERY, { slug });
+  const data = await fetchGraphQL<OpstinaData>(OPSTINA_QUERY, { slug });
   return data.opstina;
 }
+
+export async function getOpstine(): Promise<OpstinaListItem[]> {
+  const data = await fetchGraphQL<{ opstine: OpstinaListItem[] }>(
+    OPSTINE_QUERY,
+  );
+  return data.opstine;
+}
+
+export const OPSTINA_DOC: TypedDocumentNode<OpstinaData, OpstinaVars> =
+  gql(OPSTINA_QUERY);
