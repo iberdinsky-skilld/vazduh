@@ -1,3 +1,4 @@
+import Link from "next/link";
 import "./globals.css";
 
 /**
@@ -11,9 +12,9 @@ export default function GlobalNotFound() {
       <body className="flex min-h-full flex-col bg-background text-foreground">
         <main className="mx-auto flex w-full max-w-3xl flex-col gap-4 px-4 py-16">
           <h1 className="text-3xl font-bold">Page not found</h1>
-          <a href="/" className="underline underline-offset-2">
+          <Link href="/" className="underline underline-offset-2">
             ← Vazduh
-          </a>
+          </Link>
         </main>
       </body>
     </html>
