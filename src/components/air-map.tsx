@@ -6,33 +6,22 @@ import { Protocol } from "pmtiles";
 import { layers, namedFlavor } from "@protomaps/basemaps";
 import "maplibre-gl/dist/maplibre-gl.css";
 import type { OpstinaListItem } from "@/lib/graphql/opstina";
+import { eaqiFillExpression } from "@/lib/aqi";
+import { cn } from "@/lib/utils";
 
 type Props = {
   opstine: OpstinaListItem[];
   selected: string;
   onSelect: (slug: string) => void;
+  className?: string;
 };
 
-/** European AQI bands and official EEA colours; -1 = no data. */
-const EAQI_FILL = [
-  "step",
-  ["coalesce", ["get", "eaqi"], -1],
-  "#d0d0d0",
-  0,
-  "#50f0e6",
-  20,
-  "#50ccaa",
-  40,
-  "#f0e641",
-  60,
-  "#ff5050",
-  80,
-  "#960032",
-  100,
-  "#7d2181",
-] as const;
-
-export default function AirMap({ opstine, selected, onSelect }: Props) {
+export default function AirMap({
+  opstine,
+  selected,
+  onSelect,
+  className,
+}: Props) {
   // React does not own what is inside the map; it only needs the container
   // element and a handle on the instance.
   const container = useRef<HTMLDivElement>(null);
@@ -89,7 +78,10 @@ export default function AirMap({ opstine, selected, onSelect }: Props) {
         id: "opstine-fill",
         type: "fill",
         source: "opstine",
-        paint: { "fill-color": EAQI_FILL as never, "fill-opacity": 0.45 },
+        paint: {
+          "fill-color": eaqiFillExpression() as never,
+          "fill-opacity": 0.45,
+        },
       });
       map.addLayer({
         id: "opstine-line",
@@ -137,5 +129,10 @@ export default function AirMap({ opstine, selected, onSelect }: Props) {
     map.setFilter("opstine-selected", ["==", ["get", "slug"], selected]);
   }, [selected]);
 
-  return <div ref={container} className="h-96 w-full rounded border" />;
+  return (
+    <div
+      ref={container}
+      className={cn("w-full rounded-lg border", className)}
+    />
+  );
 }
