@@ -16,6 +16,8 @@ const eslintConfig = defineConfig([
     "docs/**",
     // Vendored MapLibre worker, copied on postinstall.
     "public/map/maplibre/**",
+    "test-results/**",
+    "playwright-report/**",
   ]),
 ]);
 

@@ -73,7 +73,11 @@
       "advice": "Reduce physical activities outdoors.",
       "sensitive": "Avoid physical activities outdoors."
     },
-    "noData": { "label": "No data", "advice": "", "sensitive": "" }
+    "noData": {
+      "label": "No data",
+      "advice": "",
+      "sensitive": ""
+    }
   },
   "Legend": {
     "title": "How to read this",
@@ -87,5 +91,13 @@
     "modelVsSensorsTerm": "Model vs sensors",
     "modelVsSensors": "The model is a Europe-wide forecast on a ~10 km grid, smooth and blind to your street. Sensors are real but hyper-local and noisy. They disagree often. Both are shown on purpose.",
     "disclaimer": "Not medical advice. Data: Open-Meteo (CAMS) and sensor.community, refreshed hourly."
+  },
+  "Error": {
+    "title": "Something went wrong",
+    "backend": "The data service is unavailable right now. Cached pages keep working; live data will return when it does.",
+    "retry": "Try again"
+  },
+  "Map": {
+    "unsupported": "The map needs WebGL2, which this browser does not provide. The readings above still work."
   }
 }
