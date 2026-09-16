@@ -44,6 +44,13 @@ request after an update waits about a second and gets the current hour. Then
 `after()` warms the three home pages, so that first visitor is usually us.
 An end-to-end test checks this chain against a mock backend.
 
+**The hourly tick lives on Netlify, the work stays in Drupal.** Pantheon runs
+Drupal's cron about once an hour, but not on a container that went to sleep,
+and a quiet site sleeps: the only clients are this app and its visitors. So a
+Netlify scheduled function hits Drupal's cron URL five past every hour; Drupal
+fetches, stores and calls the webhook as before. Found this when pages stopped
+updating and the data's own `fetchedAt` pointed at the backend, not the cache.
+
 **Two caches, two invalidations.** Drupal tags its GraphQL responses; a new row
 invalidates the API cache. Next.js tags its fetches with `air`; the webhook
 invalidates the page cache. Each side only knows about its own cache.
@@ -112,11 +119,12 @@ cp .env.example .env.local   # fill in the values
 npm run dev
 ```
 
-| Variable                  | Purpose                                              |
-| ------------------------- | ---------------------------------------------------- |
-| `NEXT_PUBLIC_GRAPHQL_URL` | Drupal GraphQL endpoint                              |
-| `REVALIDATE_SECRET`       | shared with Drupal's cron for `POST /api/revalidate` |
-| `SENTRY_AUTH_TOKEN`       | source maps on build, optional locally               |
+| Variable                  | Purpose                                                                                 |
+| ------------------------- | --------------------------------------------------------------------------------------- |
+| `NEXT_PUBLIC_GRAPHQL_URL` | Drupal GraphQL endpoint                                                                 |
+| `REVALIDATE_SECRET`       | shared with Drupal's cron for `POST /api/revalidate`                                    |
+| `SENTRY_AUTH_TOKEN`       | source maps on build, optional locally                                                  |
+| `DRUPAL_CRON_KEY`         | Netlify only: Drupal's cron key for the hourly tick (`drush state:get system.cron_key`) |
 
 ```bash
 npm test            # Vitest: component and unit tests
