@@ -1,6 +1,8 @@
 // Stand-in for Drupal's /graphql in tests. No dependencies: the schema has
-// two queries and the fixtures are small. POST /__control {"mode":"down"}
-// makes it answer 503 so tests can rehearse "the backend is down".
+// two queries and the fixtures are small. POST /__control {"mode": ...}:
+//   "up"   normal fixtures (default)
+//   "down" answers 503, to rehearse "the backend is down"
+//   "v2"   same municipalities, next hour's numbers, to rehearse revalidation
 import { createServer } from "node:http";
 
 const PORT = Number(process.env.MOCK_GRAPHQL_PORT ?? 4001);
@@ -24,6 +26,8 @@ const sensor = (id, over = {}) =>
     ...over,
   });
 
+let mode = "up";
+
 const OPSTINE = [
   {
     slug: "vracar",
@@ -31,6 +35,7 @@ const OPSTINE = [
     lat: 44.7987,
     lon: 20.4764,
     eaqi: 38,
+    eaqi2: 45,
     sensors: [
       sensor("33180"),
       sensor("56451", { pm25: 1.2 }),
@@ -43,6 +48,7 @@ const OPSTINE = [
     lat: 44.8464,
     lon: 20.3823,
     eaqi: 55,
+    eaqi2: 62,
     sensors: [sensor("26317", { pm25: 12.5 })],
   },
   {
@@ -51,21 +57,26 @@ const OPSTINE = [
     lat: 44.7396,
     lon: 20.4457,
     eaqi: null,
+    eaqi2: null,
     sensors: [],
   },
 ];
 
-const opstinaRow = (o) => ({
-  slug: o.slug,
-  name: o.name,
-  lat: o.lat,
-  lon: o.lon,
-  model:
-    o.eaqi === null ? null : measurement({ eaqi: o.eaqi, pm25: o.eaqi / 4 }),
-  sensors: o.sensors,
-});
-
-let mode = "up";
+// "v2" = the next hour's numbers, so tests can tell a rebuilt page from a cached one.
+const opstinaRow = (o) => {
+  const eaqi = mode === "v2" ? o.eaqi2 : o.eaqi;
+  const measuredAt =
+    mode === "v2" ? "2026-09-13T11:00:00+00:00" : "2026-09-13T10:00:00+00:00";
+  return {
+    slug: o.slug,
+    name: o.name,
+    lat: o.lat,
+    lon: o.lon,
+    model:
+      eaqi === null ? null : measurement({ eaqi, pm25: eaqi / 4, measuredAt }),
+    sensors: o.sensors,
+  };
+};
 
 const server = createServer((req, res) => {
   let body = "";

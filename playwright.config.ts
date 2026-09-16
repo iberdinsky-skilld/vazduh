@@ -35,7 +35,9 @@ export default defineConfig({
       reuseExistingServer: !process.env.CI,
       env: {
         NEXT_PUBLIC_GRAPHQL_URL: `http://localhost:${MOCK_PORT}/graphql`,
-        NEXT_PUBLIC_SITE_URL: `http://localhost:${APP_PORT}`,
+        // 127.0.0.1, not localhost: inside the server localhost resolves to ::1 and
+        // next start listens on IPv4, so the after() warm-up would ECONNREFUSED.
+        NEXT_PUBLIC_SITE_URL: `http://127.0.0.1:${APP_PORT}`,
         REVALIDATE_SECRET: "e2e-secret",
         // Never ship e2e errors to the real Sentry project.
         NEXT_PUBLIC_SENTRY_ENV: "e2e",
