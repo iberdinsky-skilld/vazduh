@@ -13,9 +13,16 @@ const nextConfig: NextConfig = {
   env: {
     // Netlify sets CONTEXT at build time (production | deploy-preview | branch-deploy).
     // Inlined into both server and client bundles so Sentry can tell environments apart.
-    NEXT_PUBLIC_SENTRY_ENV: process.env.CONTEXT ?? "development",
+    // An explicit value wins (e2e builds set it); otherwise Netlify's CONTEXT.
+    NEXT_PUBLIC_SENTRY_ENV:
+      process.env.NEXT_PUBLIC_SENTRY_ENV ??
+      process.env.CONTEXT ??
+      "development",
     // Netlify's production origin (set in previews too): canonical, hreflang, sitemap.
-    NEXT_PUBLIC_SITE_URL: process.env.URL ?? "http://localhost:3000",
+    NEXT_PUBLIC_SITE_URL:
+      process.env.NEXT_PUBLIC_SITE_URL ??
+      process.env.URL ??
+      "http://localhost:3000",
   },
 };
 

@@ -1,124 +1,135 @@
 # Vazduh
 
-Air quality in Belgrade, municipality by municipality: a model estimate plus the
-citizen sensors nearest to you, refreshed hourly, in Serbian, English and Russian.
+Air quality in Belgrade, one municipality at a time. A model estimate plus the
+citizen sensors near you, updated every hour, in Serbian, English and Russian.
 
 Live: https://vazduh-check.netlify.app
 
-## Why it exists
+## Why
 
-Belgrade has six official monitoring stations for 1.7 million people, and the
-popular aggregators show one number per city. Vazduh answers a narrower question:
-what does the air look like in _your_ municipality right now, and how much
-should you trust that number. The model and the citizen sensors often disagree.
-Both are shown, with the reasons, on purpose.
+Belgrade has six official air stations for 1.7 million people, and most sites
+show one number for the whole city. Vazduh shows your municipality, tells you
+where the number comes from, and admits when the model and the sensors disagree.
 
 ## How it works
 
 ```
-every hour ─ Drupal cron ─► Open-Meteo (17 centroids)  ┐
-                          ─► sensor.community (radius) ┴► measurement table
-                          ─► POST /api/revalidate ─► revalidateTag("air")
-                                                        │
-Next.js on Netlify ◄─ GraphQL (read-only) ◄─ Drupal on Pantheon
-  static pages, 1h TTL, tag "air"; Apollo in the browser for the interactive parts
+every hour:  Drupal cron  →  Open-Meteo + sensor.community  →  database
+                          →  POST /api/revalidate  →  Next.js rebuilds pages
 ```
 
-- **Backend**: Drupal 11 on Pantheon. A custom module owns a lean `measurement`
-  entity (one table, indexes, unique key per source/sensor/hour), the two source
-  adapters, point-in-polygon assignment of sensors to municipalities, and a
-  hand-written GraphQL schema. Repo: separate.
-- **Frontend**: Next.js 16 App Router, React 19, TypeScript strict, Tailwind 4,
-  shadcn/ui, Apollo Client, next-intl, MapLibre + Protomaps, Sentry.
-- **Data**: [Open-Meteo](https://open-meteo.com) (CAMS Europe model, CC-BY 4.0)
-  and [sensor.community](https://sensor.community). Health messages and colour
-  bands follow the [European Air Quality Index](https://airindex.eea.europa.eu/AQI/index.html).
+- **Backend**: Drupal 11 on Pantheon. One custom module: a `measurement` table,
+  the two data sources, sensor-to-municipality matching, a read-only GraphQL API.
+- **Frontend**: Next.js 16 (App Router), React 19, TypeScript, Tailwind 4,
+  shadcn/ui, Apollo Client, next-intl, MapLibre + Protomaps, Sentry. Hosted on
+  Netlify.
+- **Data**: [Open-Meteo](https://open-meteo.com) (CAMS model) and
+  [sensor.community](https://sensor.community). Colours and health advice follow
+  the [European Air Quality Index](https://airindex.eea.europa.eu/AQI/index.html).
 
-## Decisions and trade-offs
+## Decisions
 
-**Static pages with a one-hour TTL, plus on-demand revalidation.** Every page
-(3 locales × 18) is prerendered. Time-based revalidation alone would work, but
-the TTL is counted from the last rebuild, not from the source's schedule, so a
-page could be almost two hours behind. Drupal's cron therefore calls
-`/api/revalidate` right after it writes new rows; the TTL stays as a safety net.
-If Drupal is down, cached pages keep serving. That is the point of static.
+Short version of the choices that shaped the code, and what they cost.
 
-**Two caches, two invalidations.** Drupal tags its GraphQL responses with
-`measurement_list`, so a new row invalidates the API's cache. Next.js tags its
-fetches with `air`, so the webhook invalidates the page cache. Each layer only
-knows about itself; both are needed.
+**Pages are static and rebuilt on demand.** All 54 pages (3 languages × 18) are
+prebuilt and cached for an hour. When Drupal has a new hour of data, its cron
+calls `/api/revalidate` and the pages expire. If Drupal is down, the cached
+pages keep serving.
 
-**Server `fetch` for pages, Apollo only in the browser.** Server components
-call GraphQL with plain `fetch` to get Next.js caching, tags and request
-memoization. Apollo runs client-side for the parts that change on user action
-without a navigation (municipality picker, map selection), where its normalized
-cache means switching back and forth does not refetch. The two paths can be up
-to an hour apart in freshness; the UI accepts that rather than forcing one path
-to do the other's job.
+**The first visitor after an update waits, everyone else is fast.** Next.js
+can serve a stale page while rebuilding in the background (`"max"` profile).
+That is fine for a blog, but here 54 pages would each need two visits to catch
+up. So the webhook uses `{ expire: 0 }`: stale is never served, the first
+request after an update waits about a second and gets the current hour. Then
+`after()` warms the three home pages, so that first visitor is usually us.
+An end-to-end test checks this chain against a mock backend.
 
-**Municipality names in Latin script in every locale, for now.** They come from
-Drupal's taxonomy; translated terms are a backend change, not a frontend one.
+**Two caches, two invalidations.** Drupal tags its GraphQL responses; a new row
+invalidates the API cache. Next.js tags its fetches with `air`; the webhook
+invalidates the page cache. Each side only knows about its own cache.
+
+**Server fetch for pages, Apollo in the browser.** Server components fetch
+GraphQL with plain `fetch`, which gives Next.js caching for free. Apollo runs
+only in the browser, for the parts that change on click without a page load
+(municipality picker, map). The two can be up to an hour apart; we accept that.
+
+**One slug, three languages.** URLs are `/sr/opstina/vracar`, `/en/…`, `/ru/…`.
+Slugs never change; only the name is translated (from Drupal's taxonomy).
+
+**Map without a tile server.** A 14 MB PMTiles file of Belgrade lives in
+`public/`; the browser fetches byte ranges from Netlify. MapLibre 6 loads its
+worker as an ES module relative to its own file, which Turbopack cannot serve,
+so `postinstall` copies the worker into `public/` and we point MapLibre at it.
+
+**Sentry Session Replay loads lazily.** It was the heaviest thing in the bundle
+and nothing on first paint needs it. Lighthouse performance went from 59 to 95.
 
 **shadcn/ui copies components into the repo.** Full control over markup and
-accessibility; the cost is that upstream fixes have to be pulled in by hand.
+accessibility; upstream fixes have to be pulled in by hand.
 
-**Map basemap is a 14 MB PMTiles file in `public/`.** No tile server, no API
-key, no rate limits: the browser fetches byte ranges and Netlify serves 206s.
-MapLibre 6 loads its worker as an ES module relative to `import.meta.url`,
-which Turbopack cannot serve, so `postinstall` copies the worker into
-`public/map/maplibre/` and `setWorkerUrl` points at it.
+**Schema changes go backend first.** The build asks the live GraphQL endpoint for
+the list of municipalities, so a query using a field Drupal does not have yet
+fails the build. Deploy Drupal, then merge the frontend.
 
-**Sentry Session Replay is loaded lazily.** It was the single heaviest thing in
-the client bundle and nothing on first paint needs it. Errors are still
-captured immediately; replay attaches once the page is idle.
+**Health advice is quoted, not written.** English texts are the EEA's, verbatim.
+Serbian and Russian are our translations, and the page says so.
 
-**Localised 404 pages are rendered by the browser.** The root layout lives
-inside `[locale]`, which Next.js documents as the hard case for `not-found`.
-The status code is 404 and the translated page appears after hydration; a
-crawler sees Next's fallback shell.
+## Looking at the cache
 
-**Health advice is quoted, not written.** English texts are the EEA's verbatim;
-Serbian and Russian are our translations and the page says so.
-
-## From pull request to production
-
-1. Branch, PR. CI runs typecheck, lint, Prettier, Vitest, and Playwright against
-   a production build wired to a mock GraphQL server (`tests/mock`), so the
-   suite needs neither Drupal nor secrets. One scenario takes the backend down
-   mid-test and checks that cached pages still serve and the picker degrades to
-   an error state with a working retry.
-2. Netlify builds a deploy preview per PR. `main` is protected: PR only, CI
-   green required.
-3. Merge → production deploy. Environment variables live in Netlify; the app
-   needs `NEXT_PUBLIC_GRAPHQL_URL`, `REVALIDATE_SECRET` and `SENTRY_AUTH_TOKEN`
-   (source maps). `URL` and `CONTEXT` come from Netlify itself.
-4. Errors go to Sentry via a same-origin tunnel (`/monitoring`) so ad blockers
-   do not eat them; the environment tag distinguishes production, previews and
-   local runs.
-
-## Local development
+Netlify reports every cache layer a response went through:
 
 ```bash
-nvm use            # Node 22, see .nvmrc
-npm install        # also copies the MapLibre worker into public/
-cp .env.example .env.local   # then fill in the values
+curl -sI https://vazduh-check.netlify.app/sr | grep -i 'cache-status\|x-nextjs-date'
+```
+
+```
+cache-status: "Next.js"; hit, "Netlify Durable"; hit; ttl=3221, "Netlify Edge"; fwd=miss; stored
+x-nextjs-date: Wed, 16 Sep 2026 07:08:07 GMT
+```
+
+Three caches in one line: Next.js inside the function, Netlify's shared durable
+cache, and the edge node that answered. `x-nextjs-date` is when the page was
+built. Right after an hourly update the date jumps and one layer reports a
+miss; a minute later everything is `hit` again.
+
+## Numbers
+
+Lighthouse, desktop, production `/sr`:
+
+|                                    | Before lazy Replay | After         |
+| ---------------------------------- | ------------------ | ------------- |
+| Performance                        | 59                 | 95            |
+| Total Blocking Time                | 1,740 ms           | 70 ms         |
+| LCP / CLS                          | 1.1 s / 0.001      | 0.7 s / 0.001 |
+| Accessibility, Best practices, SEO | 100 each           | 100 each      |
+
+## Working on it
+
+```bash
+nvm use                      # Node 22
+npm install                  # also copies the MapLibre worker
+cp .env.example .env.local   # fill in the values
 npm run dev
 ```
 
-| Variable                  | Purpose                                                 |
-| ------------------------- | ------------------------------------------------------- |
-| `NEXT_PUBLIC_GRAPHQL_URL` | Drupal GraphQL endpoint (inlined at build time)         |
-| `REVALIDATE_SECRET`       | shared with Drupal's cron for `POST /api/revalidate`    |
-| `SENTRY_AUTH_TOKEN`       | source map upload during `next build`; optional locally |
+| Variable                  | Purpose                                              |
+| ------------------------- | ---------------------------------------------------- |
+| `NEXT_PUBLIC_GRAPHQL_URL` | Drupal GraphQL endpoint                              |
+| `REVALIDATE_SECRET`       | shared with Drupal's cron for `POST /api/revalidate` |
+| `SENTRY_AUTH_TOKEN`       | source maps on build, optional locally               |
 
 ```bash
-npm test           # Vitest component and unit tests
-npm run test:e2e   # Playwright, builds the app against the mock backend
+npm test            # Vitest: component and unit tests
+npm run test:e2e    # Playwright against a production build + mock backend
 npm run typecheck && npm run lint && npm run format:check
 ```
 
-## Licences and attribution
+Every pull request runs all of the above in CI and gets a Netlify deploy
+preview. `main` is protected; merging deploys to production. Errors go to
+Sentry through a same-origin tunnel so ad blockers do not eat them.
 
-Open-Meteo data under CC-BY 4.0. sensor.community data under ODbL. Map data
-© OpenStreetMap contributors, tiles by Protomaps. Health messages © European
-Environment Agency. Not medical advice.
+## Credits
+
+Open-Meteo (CC-BY 4.0), sensor.community (ODbL), map data © OpenStreetMap
+contributors, tiles by Protomaps, health messages © European Environment Agency.
+Not medical advice.
